@@ -1,0 +1,8 @@
+
+DemoView 是一个定制化的游戏View， 重载了onDraw, onTouch方法
+
+用户点击屏幕时候触发onTouch方法，从而触发game start:
+
+send message to Handler with a thread that send message to the handler every 10 milliseconds.
+
+
