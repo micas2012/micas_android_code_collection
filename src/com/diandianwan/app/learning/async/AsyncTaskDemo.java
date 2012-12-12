@@ -1,4 +1,4 @@
-package com.android.wei.thread;
+package com.diandianwan.app.learning.async;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -20,7 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
-public class Activity02 extends Activity{
+public class AsyncTaskDemo extends Activity{
   
 	/**开始StartAsync按钮**/
 	Button mButton = null;

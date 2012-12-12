@@ -1,4 +1,4 @@
-package com.android.wei.thread;
+package com.diandianwan.app.learning.async;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -16,6 +16,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.
+import com.diandianwan.app.R;
+
 /**
  * 
  * 1.Thread与Handler组合，比较常见
@@ -27,7 +30,7 @@ import android.widget.TextView;
 * 最后加载完成返回一个List给UI线程 ，Handler就是一个后台线程与UI线程中间的桥梁
 */
 
-public class Activity01 extends Activity {
+public class ThreadHandler extends Activity {
     /** Called when the activity is first created. */
   
     /**读取进度**/
