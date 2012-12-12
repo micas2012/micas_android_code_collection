@@ -18,7 +18,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import com.diandianwan.app.R;
 
 public class AsyncTaskDemo extends Activity{
   

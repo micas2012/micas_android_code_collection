@@ -8,7 +8,7 @@
               android:text="@string/str_tab1"/>
     <Button android:id="@+id/button1" android:layout_height="fill_parent"
             android:layout_width="fill_parent" android:text="设置"/>
-    <ImageView android:id="@+id/imageview" android:layout_height="fill_parent"
+    <ImageView android:contentDescription="test" android:id="@+id/imageview" android:layout_height="fill_parent"
                android:layout_width="fill_parent"/>
 
 

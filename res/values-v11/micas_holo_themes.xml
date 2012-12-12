@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="micas_holo" parent="android:Theme.Holo">
+
+    <item name="android:editTextBackground">@drawable/edit_text_holo_dark</item>
+
+    <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewmicas_holo</item>
+
+    <item name="android:listChoiceIndicatorMultiple">@drawable/btn_check_holo_dark</item>
+
+    <item name="android:listChoiceIndicatorSingle">@drawable/btn_radio_holo_dark</item>
+
+    <item name="android:buttonStyle">@style/Buttonmicas_holo</item>
+
+    <item name="android:imageButtonStyle">@style/ImageButtonmicas_holo</item>
+
+    <item name="android:dropDownSpinnerStyle">@style/Spinnermicas_holo</item>
+
+    <item name="android:progressBarStyleHorizontal">@style/ProgressBarmicas_holo</item>
+
+    <item name="android:seekBarStyle">@style/SeekBarmicas_holo</item>
+
+    <item name="android:ratingBarStyle">@style/RatingBarmicas_holo</item>
+
+    <item name="android:ratingBarStyleIndicator">@style/RatingBarBigmicas_holo</item>
+
+    <item name="android:ratingBarStyleSmall">@style/RatingBarSmallmicas_holo</item>
+
+    <item name="android:buttonStyleToggle">@style/Togglemicas_holo</item>
+
+    <item name="android:listChoiceBackgroundIndicator">@drawable/list_selector_holo_dark</item>
+
+    <item name="android:activatedBackgroundIndicator">@drawable/activated_background_holo_dark</item>
+
+    <item name="android:fastScrollThumbDrawable">@drawable/fastscroll_thumb_holo</item>
+
+  </style>
+
+</resources>
