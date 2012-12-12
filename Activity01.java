@@ -16,6 +16,16 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+/**
+ * 
+ * 1.Thread与Handler组合，比较常见
+
+* Handler主要是帮助我们来时时更新UI线程
+
+* 这里在后天加载100张图片，然后没加载完成一个用handler 返回给UI线程一张图片并显示
+
+* 最后加载完成返回一个List给UI线程 ，Handler就是一个后台线程与UI线程中间的桥梁
+*/
 
 public class Activity01 extends Activity {
     /** Called when the activity is first created. */
