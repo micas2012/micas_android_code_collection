@@ -1,4 +1,20 @@
 <resources>
-    <string name="app_name">app learning</string>
-    <string name="str_tab1">test</string>
+    <string name="app_name">diandianwan android training</string>
+    <string name="edit_message">Please Input Your Name:</string>
+    <string name="btn_submit">提交</string>
+    <string name="title_activity_display_message">My Message</string>
+    <string name="btn_download_img">下载图片</string>
+    <string name="str_tab1">日程表</string>
+    <string name="str_tab2">通讯录</string>
+    <string name="str_tab3">天气预报</string>
+    <string name="ok">ok</string>
+    <string name="cancel">cancel</string>
+    <string name="blah">blah</string>
+    <string name="to">to</string>
+    <string name="subject">subject</string>
+    <string name="message">message</string>
+    <string name="send">send</string>
+    <string name="app_label">@string/app_name</string>
+    <string name="search_hint">全文搜索</string>
+    <string name="saved_high_score">High_Score</string>
 </resources>

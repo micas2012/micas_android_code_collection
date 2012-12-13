@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+    <TextView android:id="@+id/dialog_content" android:layout_width="fill_parent" android:layout_height="fill_parent"/>
+
+    <Button android:id="@+id/btn_ok" android:layout_width="fill_parent"
+            android:layout_height="fill_parent" android:text="@string/ok"/>
+    <Button android:onClick="onClickAction" android:id="@+id/btn_cancel" android:layout_width="fill_parent" android:layout_height="fill_parent"
+            android:text="@string/cancel"/>
+
+    <ImageView android:contentDescription="@string/blah" android:id="@+id/image_1" android:layout_width="fill_parent"
+               android:layout_height="fill_parent"/>
+
+</LinearLayout>

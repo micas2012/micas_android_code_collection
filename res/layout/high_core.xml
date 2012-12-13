@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical">
+
+    <TextView android:id="@+id/high_score" android:layout_width="fill_parent"
+              android:layout_height="fill_parent" android:hint="高分榜"/>
+
+    <Button android:id="@+id/btn_hs_set" android:layout_height="fill_parent"
+            android:layout_width="fill_parent" android:text="设置"/>
+
+    <Button android:id="@+id/btn_hs_get" android:layout_height="fill_parent"
+            android:layout_width="fill_parent" android:text="获取"/>
+    <EditText android:id="@+id/et_hs_input" android:hint="new score in here"
+              android:layout_height="fill_parent"
+              android:layout_width="fill_parent">
+
+    </EditText>
+
+</LinearLayout>
