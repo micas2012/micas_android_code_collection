@@ -1,0 +1,81 @@
+一个独立的，无需服务进程，支持事务处理，可以使用SQL语言的数据库
+
+
+
+构造函数做两件事情，首先，检查数据库是否存在，如果不存在，则调用onCreate方法创建数据库。
+然后，如果数据库已经存在了，那么就检查数据库版本是否和构造函数中传入的数据库版本值一致，
+从而决定数据库是不是已经更新(updated)过了，如果需要更新，则调用onUpgrade方法。
+
+CRUD基本操作：
+
+INSERT
+//可能会有转义问题
+SQLiteDatabase db = ....;
+db.execSQL("insert into person(name, age) values('传智播客', 4)");
+db.close();
+
+//解决转义
+SQLiteDatabase db = ....;
+db.execSQL("insert into person(name, age) values(?,?)", new Object[]{"传智播客", 4});
+db.close();
+
+
+SELECT:
+rawQuery()方法的第一个参数为select语句；第二个参数为select语句中占位符参数的值
+SQLiteDatabase db = ....;
+Cursor cursor = db.rawQuery(“select * from person”, null);
+while (cursor.moveToNext()) {
+	int personid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
+	String name = cursor.getString(1);//获取第二列的值
+	int age = cursor.getInt(2);//获取第三列的值
+}
+cursor.close();
+db.close();
+
+或者：
+Cursor cursor = db.rawQuery("select * from person where name like ? and age=?", new String[]{"%传智%", "4"});
+
+SQLiteDatabase还专门提供了对应于添加、删除、更新、查询的操作方法： insert()、delete()、update()
+和query() 。这些方法实际上是给那些不太了解SQL语法的菜鸟使用的，对于熟悉SQL语法的程序员而言，
+直接使用execSQL()和rawQuery()方法执行SQL语句就能完成数据的添加、删除、更新、查询操作。
+
+SQLiteDatabase db = databaseHelper.getWritableDatabase();
+ContentValues values = new ContentValues();
+values.put("name", "传智播客");
+values.put("age", 4);
+long rowid = db.insert(“person”, null, values);//返回新添记录的行号，与主键id无关
+
+//delete()方法的使用：
+SQLiteDatabase db = databaseHelper.getWritableDatabase();
+db.delete("person", "personid<?", new String[]{"2"});
+db.close();
+//上面代码用于从person表中删除personid小于2的记录。
+
+//update()方法的使用：
+SQLiteDatabase db = databaseHelper.getWritableDatabase();
+ContentValues values = new ContentValues();
+values.put(“name”, “传智播客”);//key为字段名，value为值
+db.update("person", values, "personid=?", new String[]{"1"});
+db.close();
+//上面代码用于把person表中personid等于1的记录的name字段的值改为“传智播客”。
+
+
+SQLiteDatabase db = databaseHelper.getWritableDatabase();
+Cursor cursor = db.query("person", new String[]{"personid,name,age"}, "name like ?", new String[]{"%传智%"}, null, null, "personid desc", "1,2");
+while (cursor.moveToNext()) {
+         int personid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
+        String name = cursor.getString(1);//获取第二列的值
+        int age = cursor.getInt(2);//获取第三列的值
+}
+cursor.close();
+db.close();
+上面代码用于从person表中查找name字段含有“传智”的记录，匹配的记录按personid降序排序，对排序后的结果略过第一条记录，只获取2条记录。
+query(table, columns, selection, selectionArgs, groupBy, having, orderBy, limit)方法各参数的含义：
+table：表名。相当于select语句from关键字后面的部分。如果是多表联合查询，可以用逗号将两个表名分开。
+columns：要查询出来的列名。相当于select语句select关键字后面的部分。
+selection：查询条件子句，相当于select语句where关键字后面的部分，在条件子句允许使用占位符“?”
+selectionArgs：对应于selection语句中占位符的值，值在数组中的位置与占位符在语句中的位置必须一致，否则就会有异常。
+groupBy：相当于select语句group by关键字后面的部分
+having：相当于select语句having关键字后面的部分
+orderBy：相当于select语句order by关键字后面的部分，如：personid desc, age asc;
+limit：指定偏移量和获取的记录数，相当于select语句limit关键字后面的部分。

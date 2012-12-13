@@ -1,0 +1,373 @@
+All about Looper, MessageQueue, Message, Handler
+
+一、几个关键概念
+
+1、MessageQueue：是一种 数据 结构，见名知义，就是一个消息队列，存放消息的地方。每一个线程最多只可以拥有一个MessageQueue数据结构。
+创建一个线程的时候，并不会 自动 创建其MessageQueue。通常使用一个Looper对象对该线程的MessageQueue进行管理。主线程创建时，会创建一
+个默认的Looper对象，而Looper对象的创建，将自动创建一个Message Queue。其他非主线程，不会自动创建Looper，要需要的时候，通过调
+用prepare函数来实现。
+
+2、Message：消息对象，Message Queue中的存放的对象。一个Message Queue中包含多个Message。
+Message实例对象的取得，通常使用Message类里的静态方法obtain(),该方法有多个重载版本可供选择；它的创建并不一定是直接创建一个新的实例，
+而是先从Message Pool(消息池)中看有没有可用的Message实例，存在则直接取出返回这个实例。如果Message Pool中没有可用的Message实例，
+则才用给定的参数创建一个Message对象。调用removeMessages()时，将Message从Message Queue中删除，同时放入到Message Pool中。除了上面这
+种方式，也可以通过Handler对象的obtainMessage() 获取 一个Message实例。
+
+3、Looper：
+是MessageQueue的管理者。每一个MessageQueue都不能脱离Looper而存在，Looper对象的创建是通过prepare函数来实现的。同时每一个Looper对象
+和一个线程关联。通过调用Looper.myLooper()可以获得当前线程的Looper对象
+创建一个Looper对象时，会同时创建一个MessageQueue对象。除了主线程有默认的Looper，其他线程默认是没有MessageQueue对象的，所以，不能
+接受Message。如需要接受，自己 定义 一个Looper对象(通过prepare函数),这样该线程就有了自己的Looper对象和MessageQueue数据结构了。
+Looper从MessageQueue中取出Message然后，交由Handler的handleMessage进行处理。处理完成后，调用Message.recycle()将其放入Message Pool中。
+
+4、Handler：
+消息的处理者，handler负责将需要传递的信息封装成Message，通过调用handler对象的obtainMessage()来实现；
+将消息传递给Looper，这是通过handler对象的sendMessage()来实现的。继而由Looper将Message放入MessageQueue中。
+当Looper对象看到MessageQueue中含有Message，就将其广播出去。该handler对象收到该消息后，调用相应的handler对象的handleMessage()方法
+对其进行处理。
+
+NB: new Handler(): Default constructor associates this handler with the queue for the  current thread.
+
+
+二、线程之间的消息如何进行传递
+
+1、主线程给自己发送Message
+
+package test.message;
+
+import  android .app.Activity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.view. View ;
+import android.widget.Button;
+import android.widget. TextView ;
+
+public class MainActivity extends Activity {
+
+    private Button btnTest;
+    private TextView textView;
+
+    private Handler handler;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        btnTest = (Button)this.findViewById(R.id.btn_01);
+        textView = (TextView)this.findViewById(R.id.view_01);
+
+        btnTest.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+                Looper looper = Looper.getMainLooper(); //主线程的Looper对象
+                //这里以主线程的Looper对象创建了handler，
+                //所以，这个handler发送的Message会被传递给主线程的MessageQueue。
+                handler = new MyHandler(looper);
+                handler.removeMessages(0);
+                //构建Message对象
+                //第一个参数：是自己指定的message代号，方便在handler选择性地接收
+                //第二三个参数没有什么意义
+                //第四个参数需要封装的对象
+                Message msg = handler.obtainMessage(1,1,1,"主线程发消息了");
+
+                handler.sendMessage(msg); //发送消息
+
+            }
+        });
+    }
+
+    class MyHandler extends Handler{
+
+        public MyHandler(Looper looper){
+            super(looper);
+        }
+
+        public void handleMessage(Message msg){
+            super.handleMessage(msg);
+            textView.setText("我是主线程的Handler，收到了消息："+(String)msg.obj);
+        }
+    }
+}
+
+2、其他线程给主线程发送Message
+
+package test.message;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+public class MainActivity extends Activity {
+
+    private Button btnTest;
+    private TextView textView;
+
+    private Handler handler;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        btnTest = (Button)this.findViewById(R.id.btn_01);
+        textView = (TextView)this.findViewById(R.id.view_01);
+
+        btnTest.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+                //可以看出这里启动了一个线程来操作消息的封装和发送的工作
+                //这样原来主线程的发送就变成了其他线程的发送，简单吧？呵呵
+                new MyThread().start();
+            }
+        });
+    }
+
+    class MyHandler extends Handler{
+
+        public MyHandler(Looper looper){
+            super(looper);
+        }
+
+        public void handleMessage(Message msg){
+            super.handleMessage(msg);
+            textView.setText("我是主线程的Handler，收到了消息："+(String)msg.obj);
+        }
+    }
+
+    //加了一个线程类
+    class MyThread extends Thread{
+
+        public void run(){
+            Looper looper = Looper.getMainLooper(); //主线程的Looper对象
+            //这里以主线程的Looper对象创建了handler，
+            //所以，这个handler发送的Message会被传递给主线程的MessageQueue。
+            handler = new MyHandler(looper);
+
+            //构建Message对象
+            //第一个参数：是自己指定的message代号，方便在handler选择性地接收
+            //第二三个参数没有什么意义
+            //第四个参数需要封装的对象
+            Message msg = handler.obtainMessage(1,1,1,"其他线程发消息了");
+
+            handler.sendMessage(msg); //发送消息
+        }
+    }
+}
+
+3、主线程给其他线程发送Message
+
+package test.message;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+public class MainActivity extends Activity {
+
+    private Button btnTest;
+    private TextView textView;
+
+    private Handler handler;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        btnTest = (Button)this.findViewById(R.id.btn_01);
+        textView = (TextView)this.findViewById(R.id.view_01);
+
+
+        //启动线程
+        new MyThread().start();
+
+        btnTest.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                //这里handler的实例化在线程中
+                //线程启动的时候就已经实例化了
+                Message msg = handler.obtainMessage(1,1,1,"主线程发送的消息");
+                handler.sendMessage(msg);
+            }
+        });
+    }
+
+    class MyHandler extends Handler{
+
+        public MyHandler(Looper looper){
+            super(looper);
+        }
+
+        public void handleMessage(Message msg){
+            super.handleMessage(msg);
+            textView.setText("我是主线程的Handler，收到了消息："+(String)msg.obj);
+        }
+    }
+
+    class MyThread extends Thread{
+
+        public void run(){
+            Looper.prepare(); //创建该线程的Looper对象，用于接收消息
+
+            //注意了：这里的handler是定义在主线程中的哦，呵呵，
+            //前面看到直接使用了handler对象，是不是在找，在什么地方实例化的呢？
+            //现在看到了吧？？？呵呵，开始的时候实例化不了，因为该线程的Looper对象
+            //还不存在呢。现在可以实例化了
+            //这里Looper.myLooper()获得的就是该线程的Looper对象了
+            handler = new ThreadHandler(Looper.myLooper());
+
+            //这个方法，有疑惑吗？
+            //其实就是一个循环，循环从MessageQueue中取消息。
+            //不经常去看看，你怎么知道你有新消息呢？？？
+            Looper.loop();
+
+        }
+
+        //定义线程类中的消息处理类
+        class ThreadHandler extends Handler{
+
+            public ThreadHandler(Looper looper){
+                super(looper);
+            }
+
+            public void handleMessage(Message msg){
+                //这里对该线程中的MessageQueue中的Message进行处理
+                //这里我们再返回给主线程一个消息
+                handler = new MyHandler(Looper.getMainLooper());
+
+                Message msg2 = handler.obtainMessage(1,1,1,"子线程收到:"+(String)msg.obj);
+
+                handler.sendMessage(msg2);
+            }
+        }
+    }
+}
+
+4、其他线程给自己发送Message
+
+package test.message;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+public class MainActivity extends Activity {
+
+    private Button btnTest;
+    private TextView textView;
+
+    private Handler handler;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        btnTest = (Button)this.findViewById(R.id.btn_01);
+        textView = (TextView)this.findViewById(R.id.view_01);
+
+
+        btnTest.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                //启动线程
+                new MyThread().start();
+            }
+        });
+    }
+
+    class MyHandler extends Handler{
+
+        public MyHandler(Looper looper){
+            super(looper);
+        }
+
+        public void handleMessage(Message msg){
+            super.handleMessage(msg);
+            textView.setText((String)msg.obj);
+        }
+    }
+
+    class MyThread extends Thread{
+
+        public void run(){
+            Looper.prepare(); //创建该线程的Looper对象
+            //这里Looper.myLooper()获得的就是该线程的Looper对象了
+            // handler = new Handler(); 等同
+            handler = new ThreadHandler(Looper.myLooper());
+            Message msg = handler.obtainMessage(1,1,1,"我自己");
+            handler.sendMessage(msg);
+
+            Looper.loop();
+
+        }
+
+        //定义线程类中的消息处理类
+        class ThreadHandler extends Handler{
+
+            public ThreadHandler(Looper looper){
+                super(looper);
+            }
+
+            public void handleMessage(Message msg){
+                //这里对该线程中的MessageQueue中的Message进行处理
+                //这里我们再返回给主线程一个消息
+                //加入判断看看是不是该线程自己发的信息
+                if(msg.what == 1 && msg.obj.equals("我自己")){
+
+                    handler = new MyHandler(Looper.getMainLooper());
+
+                    Message msg2 = handler.obtainMessage(1,1,1,"禀告主线程:我收到了自己发给自己的Message");
+
+                    handler.sendMessage(msg2);
+                }
+
+            }
+        }
+    }
+}
+
+附注：
+上面四个例子的布局 文件 是同一个文件main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:rientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<TextView  android:id="@+id/view_01"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/ hello "
+    />
+
+<Button android:id="@+id/btn_01"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="测试消息" />
+</LinearLayout>
